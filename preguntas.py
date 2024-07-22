@@ -1,20 +1,10 @@
-"""
-Laboratorio - Manipulación de Datos usando Pandas
------------------------------------------------------------------------------------------
-
-Este archivo contiene las preguntas que se van a realizar en el laboratorio.
-
-Utilice los archivos `tbl0.tsv`, `tbl1.tsv` y `tbl2.tsv`, para resolver las preguntas.
-
-"""
 import pandas as pd
-
 tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
 tbl1 = pd.read_csv("tbl1.tsv", sep="\t")
 tbl2 = pd.read_csv("tbl2.tsv", sep="\t")
 
-
 def pregunta_01():
+    return len(tbl0)
     """
     ¿Cuál es la cantidad de filas en la tabla `tbl0.tsv`?
 
@@ -26,6 +16,7 @@ def pregunta_01():
 
 
 def pregunta_02():
+    return len(tbl0.columns)
     """
     ¿Cuál es la cantidad de columnas en la tabla `tbl0.tsv`?
 
@@ -37,6 +28,7 @@ def pregunta_02():
 
 
 def pregunta_03():
+    return tbl0['_c1'].value_counts().sort_index()
     """
     ¿Cuál es la cantidad de registros por cada letra de la columna _c1 del archivo
     `tbl0.tsv`?
@@ -54,6 +46,8 @@ def pregunta_03():
 
 
 def pregunta_04():
+    Respuesta=tbl0[['_c1', '_c2']].groupby(['_c1']).mean()
+    return Respuesta.squeeze()
     """
     Calcule el promedio de _c2 por cada letra de la _c1 del archivo `tbl0.tsv`.
 
@@ -69,6 +63,8 @@ def pregunta_04():
 
 
 def pregunta_05():
+    Respuesta=tbl0[['_c1', '_c2']].groupby(['_c1']).max()
+    return Respuesta.squeeze()
     """
     Calcule el valor máximo de _c2 por cada letra en la columna _c1 del archivo
     `tbl0.tsv`.
@@ -86,6 +82,8 @@ def pregunta_05():
 
 
 def pregunta_06():
+    Respuesta=tbl1['_c4'].unique()
+    return sorted(map(lambda x: x.upper(), Respuesta))
     """
     Retorne una lista con los valores unicos de la columna _c4 de del archivo `tbl1.csv`
     en mayusculas y ordenados alfabéticamente.
@@ -98,6 +96,8 @@ def pregunta_06():
 
 
 def pregunta_07():
+    Respuesta=tbl0[['_c1', '_c2']].groupby(['_c1']).sum()
+    return Respuesta.squeeze()
     """
     Calcule la suma de la _c2 por cada letra de la _c1 del archivo `tbl0.tsv`.
 
@@ -114,6 +114,11 @@ def pregunta_07():
 
 
 def pregunta_08():
+    Suma=tbl0.sum(numeric_only=True, axis=1).tolist()
+    Sumas=tbl0.copy()
+    Sumas['suma']=Suma 
+    return Sumas
+
     """
     Agregue una columna llamada `suma` con la suma de _c0 y _c2 al archivo `tbl0.tsv`.
 
@@ -132,6 +137,10 @@ def pregunta_08():
 
 
 def pregunta_09():
+    Años=list(map(lambda x: x.split('-')[0], tbl0['_c3'].tolist()))
+    Año = tbl0.copy()
+    Año['year']=Años
+    return Año
     """
     Agregue el año como una columna al archivo `tbl0.tsv`.
 
@@ -150,6 +159,13 @@ def pregunta_09():
 
 
 def pregunta_10():
+    Grupo,c2=tbl0[['_c1', '_c2']].groupby(['_c1'])['_c2'].apply(list).tolist(),[]
+    for i in Grupo:
+        X=''
+        for j in sorted(i):
+            X+=f'{j}:'
+        c2.append(X[:-1])
+    return pd.DataFrame({'_c2': c2}, index=pd.Series(['A', 'B', 'C', 'D', 'E'], name='_c1'))
     """
     Construya una tabla que contenga _c1 y una lista separada por ':' de los valores de
     la columna _c2 para el archivo `tbl0.tsv`.
@@ -167,6 +183,14 @@ def pregunta_10():
 
 
 def pregunta_11():
+    Grupo,c0,c4 = tbl1.groupby(['_c0'])['_c4'].apply(list).tolist(),tbl1['_c0'].unique().tolist(),[]
+    for i in Grupo:
+        X=''
+        for j in sorted(i):
+            X+=f'{j},'
+        c4.append(X[:-1])
+    return pd.DataFrame({'_c0': c0,'_c4': c4})
+
     """
     Construya una tabla que contenga _c0 y una lista separada por ',' de los valores de
     la columna _c4 del archivo `tbl1.tsv`.
@@ -186,6 +210,16 @@ def pregunta_11():
 
 
 def pregunta_12():
+    c5a,c5b,c0,c5=tbl2.groupby(['_c0'])['_c5a'].apply(list).tolist(),tbl2.groupby(['_c0'])['_c5b'].apply(list).tolist(),tbl1['_c0'].unique().tolist(),[]
+    for i in range(len(c5a)):
+        Lista=[]
+        for j in range(len(c5a[i])):
+            Lista.append(f'{c5a[i][j]}:{c5b[i][j]}')
+        X=''
+        for k in sorted(Lista):
+            X+=f'{k},'
+        c5.append(X[:-1])
+    return pd.DataFrame({'_c0': c0,'_c5': c5})
     """
     Construya una tabla que contenga _c0 y una lista separada por ',' de los valores de
     la columna _c5a y _c5b (unidos por ':') de la tabla `tbl2.tsv`.
@@ -204,6 +238,9 @@ def pregunta_12():
 
 
 def pregunta_13():
+    Union=pd.merge(tbl0, tbl2, on='_c0', how='inner')
+    Respuesta=Union[['_c1', '_c5b']].groupby(['_c1']).sum()
+    return Respuesta.squeeze()
     """
     Si la columna _c0 es la clave en los archivos `tbl0.tsv` y `tbl2.tsv`, compute la
     suma de tbl2._c5b por cada valor en tbl0._c1.
